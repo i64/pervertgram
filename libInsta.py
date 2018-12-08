@@ -7,5 +7,13 @@ from flask import jsonify
 from typing import List, Dict, Tuple
 
 class libInsta:
+    
+    DELAY = 0
+    
     def __init__(self, API: InstagramAPI):
         self.API = API
+
+    def delay(self):
+        self.DELAY += 1
+        if self.DELAY % 50:
+            sleep(1)
