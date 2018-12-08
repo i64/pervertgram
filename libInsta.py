@@ -20,6 +20,7 @@ class libInsta:
     API = 0
     ALL = 1
     NAN = 0
+
     def __init__(self, API: InstagramAPI):
         self.API = API
 
@@ -100,4 +101,22 @@ class libInsta:
           toc = clock()
         rendTime = toc - tic
         return self.imgfy(users, rendTime, rend)
-
+    
+    def getLocationFeed(self, victim: int, rend: int, getAll=0):
+        tic = clock()
+        images = list()
+        if getAll:
+            next_max_id = True
+            while next_max_id:
+                if next_max_id is True:
+                    next_max_id = ''
+                _ = self.API.getLocationFeed(victim, maxid=next_max_id)
+                self.delay()
+                images.extend(self.API.LastJson.get('items', []))
+                next_max_id = self.API.LastJson.get('next_max_id', '')
+        else:
+            _ = self.API.getLocationFeed(victim)
+            images.extend(self.API.LastJson.get('ranked_items', []))
+        toc = clock()
+        rendTime = toc - tic
+        return self.imgfy(images, rendTime, rend, typ=getAll)
