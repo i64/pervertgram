@@ -17,3 +17,7 @@ class libInsta:
         self.DELAY += 1
         if self.DELAY % 50:
             sleep(1)
+
+    def getsUserid(self, victim: str):
+        _ = self.API.searchUsername(victim)
+        return self.API.LastJson['user']['pk']
