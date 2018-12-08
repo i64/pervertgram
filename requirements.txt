@@ -1,0 +1,4 @@
+typing==3.6.4
+Flask==1.0.2
+Flask_RESTful==0.3.6
+InstagramAPI==1.0.2
