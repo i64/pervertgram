@@ -27,6 +27,9 @@ class libInsta:
         if rend is self.RENDER:
             if typ is self.FOL:
                 return render_template('followship.html', users=data, rendTime=rendTime)
+            elif typ is self.IMAGE:
+                return render_template('imageship.html', images=data, rendTime=rendTime)
+ 
         return (data if rend else jsonify(data))
     
     def getsUserid(self, victim: str):
