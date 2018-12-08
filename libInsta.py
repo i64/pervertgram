@@ -9,7 +9,9 @@ from typing import List, Dict, Tuple
 class libInsta:
     
     DELAY = 0
+
     FOL = 0
+    IMAGE = 1
 
     JSON = 0
     RENDER = 1
