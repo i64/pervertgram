@@ -1,4 +1,4 @@
-# Pervertgram
+# PervertGram
 
 A weekend project from a cyber-pervert.
 
