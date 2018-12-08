@@ -2,34 +2,51 @@ from typing import List, Dict, Tuple
 from time import clock, sleep
 from flask import Flask, request, render_template
 from flask_restful import Resource, Api
+from json import dumps
+import json
 from InstagramAPI import InstagramAPI
 from flask import jsonify
 from typing import List, Dict, Tuple
 
 
 class libInsta:
-
-    DELAY = 0
+    JSON = 0
+    RENDER = 1
+    RAW = 2
 
     FOL = 0
     IMAGE = 1
     MAP = 2
 
-    JSON = 0
-    RENDER = 1
-    RAW = 2
-
-    API = 0
-    ALL = 1
     NAN = 0
+    ALL = 1
+    API = None
+
+    delayTime = 0
 
     def __init__(self, API: InstagramAPI):
         self.API = API
 
     def delay(self):
-        self.DELAY += 1
-        if self.DELAY % 50:
+        self.delayTime += 1
+        if self.delayTime % 100:
             sleep(1)
+
+    def getsUserid(self, victim: str):
+        _ = self.API.searchUsername(victim)
+        return self.API.LastJson['user']['pk']
+
+    def getUsersFromImages(self, images: List[dict]):
+        return [image['user'] for image in images]
+
+    def getHdimage(self, victim: str, rend):
+        tic = clock()
+        id = self.getsUserid(victim)
+        _ = self.API.getUsernameInfo(id)
+        data = self.API.LastJson['user']
+        toc = clock()
+        rendTime = tic - toc
+        return self.imgfy([data], rendTime, rend, typ=self.IMAGE)
 
     def imgfy(self, data, rendTime: float, rend: int, typ=0):
         if rend is self.RENDER:
@@ -58,18 +75,26 @@ class libInsta:
                 users.append(self.API.LastJson)
         return users
 
-    def getsUserid(self, victim: str):
-        _ = self.API.searchUsername(victim)
-        return self.API.LastJson['user']['pk']
-
-    def getHdimage(self, victim: str, rend):
+    def getUserFollowings(self, victim: str, rend: int, getAll: int):
         tic = clock()
-        id = self.getsUserid(victim)
-        _ = self.API.getUsernameInfo(id)
-        data = self.API.LastJson['user']
+        users = list()
+        user_id = self.getsUserid(victim)
+        if getAll:
+            next_max_id = True
+            while next_max_id:
+                if next_max_id is True:
+                    next_max_id = ''
+                _ = self.API.getUserFollowings(user_id, maxid=next_max_id)
+                self.delay()
+                users.extend(self.API.LastJson.get('users', []))
+                next_max_id = self.API.LastJson.get('next_max_id', '')
+        else:
+            _ = self.API.getUserFollowings(user_id)
+            users = self.API.LastJson['users']
+
         toc = clock()
-        rendTime = tic - toc
-        return self.imgfy([data], rendTime, rend, typ=self.IMAGE)
+        rendTime = toc - tic
+        return self.imgfy(users, rendTime, rend)
 
     def getUserFollowers(self, victim: str, rend: int, getAll: int):
         tic = clock()
@@ -92,31 +117,7 @@ class libInsta:
         rendTime = toc - tic
         return self.imgfy(users, rendTime, rend)
 
-    def getUserFollowings(self, victim: str, rend: int, getAll: int):
-        tic = clock()
-        users = list()
-        user_id = self.getsUserid(victim)
-        if getAll:
-            next_max_id = True
-            while next_max_id:
-                if next_max_id is True:
-                    next_max_id = ''
-                _ = self.API.getUserFollowings(user_id, maxid=next_max_id)
-                self.delay()
-                users.extend(self.API.LastJson.get('users', []))
-                next_max_id = self.API.LastJson.get('next_max_id', '')
-        else:
-            _ = self.API.getUserFollowings(user_id)
-            users = self.API.LastJson['users']
-
-        toc = clock()
-        rendTime = toc - tic
-        return self.imgfy(users, rendTime, rend)
-
-    def getUsersFromImages(self, images: List[dict]):
-        return [image['user'] for image in images]
-        
-    def getMatch(self, victim: str, rend: int):
+    def match(self, victim: str, rend: int):
         tic = clock()
 
         followers = self.getUserFollowers(victim, self.RAW, self.ALL)
@@ -129,6 +130,7 @@ class libInsta:
         if len(followers) > len(followings):
             base = followings
         users = self.getUsersFromID(pks, base)
+
         toc = clock()
         rendTime = toc - tic
         return self.imgfy(users, rendTime, rend)
@@ -192,12 +194,10 @@ class libInsta:
         return self.imgfy(items, rendTime, rend, self.IMAGE)
 
     def getUserLocations(self, victim: str, rend: int, last=0):
-        # self.API.searchLocation("mersin")
-        # _ = self.API.getUserFeed(id)
         locations = list()
         items = self.getUserImages(victim, self.RAW, self.ALL, last)
         for item in items:
-            if item.get('lozcation', None) is None:
+            if item.get('location', None) is None:
                 pass
             else:
                 data = dict()
@@ -207,7 +207,7 @@ class libInsta:
                 else:
                     data['source'] = item['carousel_media'][0]['image_versions2']['candidates'][0]['url']
                 data['link'] = item['code']
-                data['location'] = item['location']['short_name']
+                data['location'] =(item['location']['short_name'] if item['location'].get('short_name',None) else item['location']['name'])
                 data['latitude'] = item['location']['lat']
                 data['longitude'] = item['location']['lng']
                 locations.append(data)

@@ -64,7 +64,7 @@
       var cmFollowers = document.getElementById("get-followers");
       var cmFollowings = document.getElementById("get-followings");
       var cmMatches = document.getElementById("get-matches");
-    //   var cmDP = document.getElementById("get-hd-pp");
+      var cmDP = document.getElementById("get-hd-pp");
 
       var interacts = document.getElementsByClassName("interact");
       var username;
@@ -100,6 +100,9 @@
       };
         cmMatches.onclick = function() {
         window.open(document.location.origin + '/match/' + username, '_blank');
+      };
+      cmDP.onclick = function() {
+        window.open(document.location.origin + '/dp/' + username, '_blank');
       };
     })();
   </script>
