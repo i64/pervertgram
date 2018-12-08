@@ -44,7 +44,9 @@
 </head>
 <h1>API Latency: {{rendTime}}</h1>
 <div class="context-menu">
-  <div class="item" id="goto-profile">Go to profile</div>
+  <div class="item" id="goto-profile">Goto profile</div>
+  <div class="item" id="get-followers">Get followers</div>
+  <div class="item" id="get-followings">Get followings</div>
 </div>
 <main class="grid">
 
@@ -57,6 +59,10 @@
     (function() {
       var contextMenu = document.querySelector(".context-menu");
       var cmGotoProfile = document.getElementById("goto-profile");
+    //   var cmFollowers = document.getElementById("get-followers");
+    //   var cmFollowings = document.getElementById("get-followings");
+    //   var cmMatches = document.getElementById("get-matches");
+    //   var cmDP = document.getElementById("get-hd-pp");
 
       var interacts = document.getElementsByClassName("interact");
       var username;
@@ -82,6 +88,13 @@
 
       cmGotoProfile.onclick = function() {
         window.open('http://instagram.com/' + username, '_blank');
+      };
+
+      cmFollowers.onclick = function() {
+        window.open(document.location.origin + '/followers/' + username, '_blank');
+      };
+      cmFollowings.onclick = function() {
+        window.open(document.location.origin + '/followings/' + username, '_blank');
       };
 
     })();

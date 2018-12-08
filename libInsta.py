@@ -53,4 +53,24 @@ class libInsta:
         toc = clock()
         rendTime = toc - tic
         return self.imgfy(users, rendTime, rend)
-    
+
+    def getUserFollowers(self, victim: str, rend: int, getAll: int):
+        tic = clock()
+        users = list()
+        user_id = self.getsUserid(victim)
+        if getAll:
+            next_max_id = True
+            while next_max_id:
+                if next_max_id is True:
+                    next_max_id = ''
+                _ = self.API.getUserFollowers(user_id, maxid=next_max_id)
+                self.delay()
+                users.extend(self.API.LastJson.get('users', []))
+                next_max_id = self.API.LastJson.get('next_max_id', '')
+        else:
+            _ = self.API.getUserFollowers(user_id)
+            users = self.API.LastJson['users']
+
+        toc = clock()
+        rendTime = toc - tic
+        return self.imgfy(users, rendTime, rend)
