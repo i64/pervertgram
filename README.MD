@@ -1,6 +1,6 @@
 # Pervertgram
 
-A project for stalking people on Instagram.
+A weekend project from a cyber-pervert.
 
 ## Get followers/Followings/Matches
 ![](images/0.png)
@@ -71,6 +71,5 @@ getAll = 1 => returns all the data
     "username": "exampleUser",
     "pwd": "examplePassword"
 }
-
 
 ```
