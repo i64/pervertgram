@@ -28,16 +28,21 @@ class libInsta:
         self.DELAY += 1
         if self.DELAY % 50:
             sleep(1)
-
     def imgfy(self, data, rendTime: float, rend: int, typ=0):
         if rend is self.RENDER:
             if typ is self.FOL:
                 return render_template('followship.html', users=data, rendTime=rendTime)
+
             elif typ is self.IMAGE:
                 return render_template('imageship.html', images=data, rendTime=rendTime)
- 
+
+            elif typ is self.MAP:
+                return render_template('heatmap.html', username=data[0])
+
+        if typ is self.MAP:
+            data = data.pop()
         return (data if rend else jsonify(data))
-    
+
     def getsUserid(self, victim: str):
         _ = self.API.searchUsername(victim)
         return self.API.LastJson['user']['pk']
@@ -159,3 +164,25 @@ class libInsta:
 
         rendTime = clock() - tic
         return self.imgfy(items, rendTime, rend, self.IMAGE)
+
+    def getUserLocations(self, victim: str, rend: int, last=0):
+        # self.API.searchLocation("mersin")
+        # _ = self.API.getUserFeed(id)
+        locations = list()
+        items = self.getUserImages(victim, self.RAW, self.ALL, last)
+        for item in items:
+            if item.get('lozcation', None) is None:
+                pass
+            else:
+                data = dict()
+                # data['id']
+                if item.get("image_versions2", None):
+                    data['source'] = item['image_versions2']['candidates'][0]['url']
+                else:
+                    data['source'] = item['carousel_media'][0]['image_versions2']['candidates'][0]['url']
+                data['link'] = item['code']
+                data['location'] = item['location']['short_name']
+                data['latitude'] = item['location']['lat']
+                data['longitude'] = item['location']['lng']
+                locations.append(data)
+        return self.imgfy([victim, locations], 0, rend, self.MAP)
