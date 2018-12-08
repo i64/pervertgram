@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    @import url(https://fonts.googleapis.com/css?family=Roboto:400,300);
+
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .context-menu {
+      display: none;
+      position: absolute;
+      width: 210px;
+      cursor: pointer;
+      background: white;
+      box-shadow: 0 0 5px grey;
+    }
+
+    .context-menu .item {
+      width: 100%;
+      border-bottom: 1px solid lightgrey;
+      font-family: "Roboto", sans-serif;
+      font-size: 1.3em;
+      color: #0066aa;
+    }
+
+    .context-menu .item:last-child {
+      border: 0;
+    }
+
+    .interact {
+      display: inline-block;
+      width: 200px;
+      height: 200px;
+      background: pink;
+    }
+  </style>
+</head>
+<h1>API Latency: {{rendTime}}</h1>
+<div class="context-menu">
+  <div class="item" id="goto-profile">Go to profile</div>
+</div>
+<main class="grid">
+
+  {% for user in users %}
+  <img class="interact" src="{{user['profile_pic_url']}}" username="{{user['username']}}">
+  {% endfor %}
+</main>
+<footer>
+  <script>
+    (function() {
+      var contextMenu = document.querySelector(".context-menu");
+      var cmGotoProfile = document.getElementById("goto-profile");
+
+      var interacts = document.getElementsByClassName("interact");
+      var username;
+
+      for (var i = 0; i < interacts.length; i++) {
+        interacts[i].addEventListener("contextmenu", function(e) {
+          e.preventDefault();
+          contextMenu.style.top = window.scrollY + e.clientY + "px";
+          contextMenu.style.left = e.clientX + "px";
+          contextMenu.style.display = "block";
+          username = this.getAttribute("username");
+        });
+      }
+
+
+      document.addEventListener("click", function(e) {
+        var button = e.which || e.button;
+        if (button === 1) {
+          contextMenu.style.display = "none";
+        }
+      });
+
+
+      cmGotoProfile.onclick = function() {
+        window.open('http://instagram.com/' + username, '_blank');
+      };
+
+    })();
+  </script>
+</footer>
+
+</html>
+

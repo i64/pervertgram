@@ -53,3 +53,4 @@ class libInsta:
         toc = clock()
         rendTime = toc - tic
         return self.imgfy(users, rendTime, rend)
+    
