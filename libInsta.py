@@ -120,3 +120,42 @@ class libInsta:
         toc = clock()
         rendTime = toc - tic
         return self.imgfy(images, rendTime, rend, typ=getAll)
+
+    def getLocationPeople(self, victim: int, rend: int, getAll=0):
+        tic = clock()
+        images = self.getLocationFeed(victim, self.RAW, getAll)
+        users = self.getUsersFromImages(images)
+        tmp = list()
+        _ = [tmp.append(i) for i in users if i not in tmp]
+        users = tmp
+        del(tmp)
+        toc = clock()
+        rendTime = toc - tic
+        return self.imgfy(users, rendTime, rend)
+
+    def getUserImages(self, victim: str, rend: int, all=None, last=0):
+        tic = clock()
+        items = list()
+        id = self.getsUserid(victim)
+
+        if all:
+            next_max_id = all
+            counter = 0
+            while next_max_id:
+
+                if last is not 0:
+                    counter += 1
+                    if counter >= last:
+                        break
+
+                if next_max_id is True:
+                    next_max_id = ''
+                _ = self.API.getUserFeed(id, maxid=next_max_id)
+                items.extend(self.API.LastJson.get('items', []))
+                next_max_id = self.API.LastJson.get('next_max_id', '')
+        else:
+            _ = self.API.getUserFeed(id)
+            items = self.API.LastJson['items']
+
+        rendTime = clock() - tic
+        return self.imgfy(items, rendTime, rend, self.IMAGE)
