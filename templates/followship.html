@@ -47,6 +47,8 @@
   <div class="item" id="goto-profile">Goto profile</div>
   <div class="item" id="get-followers">Get followers</div>
   <div class="item" id="get-followings">Get followings</div>
+  <div class="item" id="get-matches">Get matches</div>
+  <div class="item" id="get-hd-pp">Full-size profile picture </div>
 </div>
 <main class="grid">
 
@@ -59,9 +61,9 @@
     (function() {
       var contextMenu = document.querySelector(".context-menu");
       var cmGotoProfile = document.getElementById("goto-profile");
-    //   var cmFollowers = document.getElementById("get-followers");
-    //   var cmFollowings = document.getElementById("get-followings");
-    //   var cmMatches = document.getElementById("get-matches");
+      var cmFollowers = document.getElementById("get-followers");
+      var cmFollowings = document.getElementById("get-followings");
+      var cmMatches = document.getElementById("get-matches");
     //   var cmDP = document.getElementById("get-hd-pp");
 
       var interacts = document.getElementsByClassName("interact");
@@ -96,7 +98,9 @@
       cmFollowings.onclick = function() {
         window.open(document.location.origin + '/followings/' + username, '_blank');
       };
-
+        cmMatches.onclick = function() {
+        window.open(document.location.origin + '/match/' + username, '_blank');
+      };
     })();
   </script>
 </footer>
