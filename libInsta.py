@@ -9,7 +9,12 @@ from typing import List, Dict, Tuple
 class libInsta:
     
     DELAY = 0
-    
+    FOL = 0
+
+    JSON = 0
+    RENDER = 1
+    RAW = 2
+
     def __init__(self, API: InstagramAPI):
         self.API = API
 
@@ -18,6 +23,12 @@ class libInsta:
         if self.DELAY % 50:
             sleep(1)
 
+    def imgfy(self, data, rendTime: float, rend: int, typ=0):
+        if rend is self.RENDER:i
+            if typ is self.FOL:
+                return render_template('followship.html', users=data, rendTime=rendTime)
+        return (data if rend else jsonify(data))
+    
     def getsUserid(self, victim: str):
         _ = self.API.searchUsername(victim)
         return self.API.LastJson['user']['pk']
