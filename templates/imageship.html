@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      grid-gap: 8;
+      align-items: stretch;
+    }
+
+    .grid img {
+      border: 1px solid #ccc;
+      box-shadow: 2px 2px 6px 0px rgba(0, 0, 0, 0.3);
+      max-width: 100%;
+      height: auto;
+
+    }
+    .normal img{
+      height: 100%;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+
+  <head>
+
+    {% if images[0].get('hd_profile_pic_url_info',None) %}
+      <main class="normal">
+    {%else%}
+    <h1>API Latency: {{rendTime}}</h1>
+      <main class="grid">
+    {%endif%}
+      {% for image in images %}
+        {% if image.get('hd_profile_pic_url_info',None) %}
+          <a href="{{image['hd_profile_pic_url_info']['url']}}">
+          <img src="{{image['hd_profile_pic_url_info']['url']}}">
+        {% else %}
+          <a href="http://instagram.com/{{image['user']['username']}}">
+          {% if image.get('carousel_media', None) %}
+            <img src="{{image['carousel_media'][0]['image_versions2']['candidates'][0]['url']}}">
+          {% elif image['image_versions2'].get('candidates',None) %}
+            <img src="{{image['image_versions2']['candidates'][0]['url']}}">
+          {% else %}
+            <img src="{{image['image_versions2'][0]['url']}}">
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </main>
+
+</html>
+

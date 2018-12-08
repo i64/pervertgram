@@ -47,6 +47,15 @@ class libInsta:
         _ = self.API.searchUsername(victim)
         return self.API.LastJson['user']['pk']
 
+    def getHdimage(self, victim: str, rend):
+        tic = clock()
+        id = self.getsUserid(victim)
+        _ = self.API.getUsernameInfo(id)
+        data = self.API.LastJson['user']
+        toc = clock()
+        rendTime = tic - toc
+        return self.imgfy([data], rendTime, rend, typ=self.IMAGE)
+
     def getUserFollowers(self, victim: str, rend: int, getAll: int):
         tic = clock()
         users = list()
