@@ -74,3 +74,22 @@ class libInsta:
         toc = clock()
         rendTime = toc - tic
         return self.imgfy(users, rendTime, rend)
+
+    def getMatch(self, victim: str, rend: int):
+        tic = clock()
+
+        followers = self.getUserFollowers(victim, self.RAW, self.ALL)
+        followings = self.getUserFollowings(victim, self.RAW, self.ALL)
+
+        pks = set([i['pk'] for i in followers]) & set(
+            [i['pk'] for i in followings])
+
+        base = followers
+        if len(followers) > len(followings):
+            base = followings
+        users = self.getUsersFromID(pks, base)
+
+          toc = clock()
+        rendTime = toc - tic
+        return self.imgfy(users, rendTime, rend)
+
