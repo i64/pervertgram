@@ -16,7 +16,10 @@ class libInsta:
     JSON = 0
     RENDER = 1
     RAW = 2
-
+    
+    API = 0
+    ALL = 1
+    NAN = 0
     def __init__(self, API: InstagramAPI):
         self.API = API
 
