@@ -57,13 +57,12 @@ def getLocationFeed(location: int, rend=1, getAll=1):
 @app.route('/dp/<victim>/<int:rend>')
 def getHdimage(victim: int, rend=1):
     return insta.getHdimage(victim, rend)
-# api.add_resource(getUserFollowings, '/followings/<victim>/<int:render>')
+
 @app.route('/heatmap/<victim>')
 @app.route('/heatmap/<victim>/<int:rend>')
 def getHeatmap(victim,rend=1):
     return insta.getUserLocations(victim,rend)
 
-# api.add_resource(getUserFollowers, '/followers/<victim>')  # Route_3
 if __name__ == '__main__':
     app.run(host="127.0.0.1",port='5002', debug=True)
 
