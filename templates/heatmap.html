@@ -23,12 +23,25 @@
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=visualization&sensor=true_or_false"></script>
   <script>
-
     var markers = [];
     var heatmap;
     var map;
-    var getBinData = function() {
+    var datacik = {};
+    var uniqid = 0;
 
+    var count = function (arraycik, data) {
+      var temp = [];
+      let loc = data.location;
+      for (var i = 0; i < arraycik.length; ++i) {
+        if (arraycik[i].location == loc)
+          temp.push(arraycik[i]);
+      }
+      return (temp.length ? temp : [data]);
+    }
+
+
+    var getBinData = function () {
+      
       var myLatlng = new google.maps.LatLng(39.9334, 32.8597);
 
       map = new google.maps.Map(document.getElementById('map-canvas'), {
@@ -37,19 +50,21 @@
         mapTypeId: google.maps.MapTypeId.ROADMAP
       });
       var iconBase = '';
-
-
-      var url = location.protocol + "//" + location.host + "/heatmap/" +  "{{username}}" + "/0"
+      var url = location.protocol + "//" + location.host + "/heatmap/" + "{{username}}" + "/0"
       var binData = []
       var infowindow = new google.maps.InfoWindow();
-
-      $.getJSON(url, function(data) {
-        $.each(data, function(index, value) {
+      var loc = [];
+      $.getJSON(url, function (data) {
+        $.each(data, function (index, value) {
           if (!isNaN(parseInt(value.latitude))) {
             binData.push(new google.maps.LatLng(value.latitude, value.longitude)); // adds lat and long data if the value is an integer
+            loc.push(value)
           };
-
-
+          // if ((temp = count(binData, value)) == 0) {
+          var trs = count(loc, value);
+          // datacik[value.location] != undefined ? datacik[value.location].push(trs) : datacik[value.location] = trs ;
+          datacik[value.location] = trs;
+          // }
 
           marker = new google.maps.Marker({
             position: new google.maps.LatLng(value.latitude, value.longitude),
@@ -59,18 +74,24 @@
 
           markers.push(marker);
 
-          google.maps.event.addListener(marker, 'click', (function(marker, index) {
-            return function() {
+          google.maps.event.addListener(marker, 'click', (function (marker, index) {
+            return function () {
+              var content = '<html>';
+              datacik[value.location].forEach(function (tmpData) {
+                content +=
+                  `
+                  <br>
+                  <a>${tmpData.location}</a>
+                  <br>
+                  <a target="_blank" rel="noopener noreferrer" href="http://instagram.com/p/${value.link}" >
+                  <img src="${tmpData.source}" width = "150">
+                  `
 
-              var content =
-              `<html>
-                <a>${value.location}</a>
-                <br>
-                <a target="_blank" rel="noopener noreferrer" href="http://instagram.com/p/${value.link}" >
-                <img src="${value.source}" width = "150">
-                </html>`;
+              });
+              content += '</html>';
               infowindow.setContent(content);
               infowindow.open(map, marker);
+
             };
           })(marker, index));
 
@@ -91,44 +112,46 @@
     function changeOpacity() {
       heatmap.set('opacity', heatmap.get('opacity') ? null : 0.2);
     }
+
     function toggleMarkers() {
-        if (markers[0].getMap() != null) {
-            var arg = null;
-        } else {
-            var arg = map;
-        }
-        for (var i = 0; i < markers.length; i++) {
-            markers[i].setMap(arg);
-        }
+      if (markers[0].getMap() != null) {
+        var arg = null;
+      } else {
+        var arg = map;
+      }
+      for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(arg);
+      }
     }
 
     function toggleHeatmap() {
 
-        if (heatmap.getMap() != null) {
-            heatmap.setMap(null);
-        } else {
-            heatmap.setMap(map);
-        }
+      if (heatmap.getMap() != null) {
+        heatmap.setMap(null);
+      } else {
+        heatmap.setMap(map);
+      }
     }
 
     function changeGradient() {
-        var gradient = [
-            'rgba(0, 255, 255, 0)',
-            'rgba(0, 255, 255, 1)',
-            'rgba(0, 191, 255, 1)',
-            'rgba(0, 127, 255, 1)',
-            'rgba(0, 63, 255, 1)',
-            'rgba(0, 0, 255, 1)',
-            'rgba(0, 0, 223, 1)',
-            'rgba(0, 0, 191, 1)',
-            'rgba(0, 0, 159, 1)',
-            'rgba(0, 0, 127, 1)',
-            'rgba(63, 0, 91, 1)',
-            'rgba(127, 0, 63, 1)',
-            'rgba(191, 0, 31, 1)',
-            'rgba(255, 0, 0, 1)'];
+      var gradient = [
+        'rgba(0, 255, 255, 0)',
+        'rgba(0, 255, 255, 1)',
+        'rgba(0, 191, 255, 1)',
+        'rgba(0, 127, 255, 1)',
+        'rgba(0, 63, 255, 1)',
+        'rgba(0, 0, 255, 1)',
+        'rgba(0, 0, 223, 1)',
+        'rgba(0, 0, 191, 1)',
+        'rgba(0, 0, 159, 1)',
+        'rgba(0, 0, 127, 1)',
+        'rgba(63, 0, 91, 1)',
+        'rgba(127, 0, 63, 1)',
+        'rgba(191, 0, 31, 1)',
+        'rgba(255, 0, 0, 1)'
+      ];
 
-        heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
+      heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
     }
 
     google.maps.event.addDomListener(window, 'load', getBinData);
@@ -148,4 +171,3 @@
 </div>
 
 </html>
-
