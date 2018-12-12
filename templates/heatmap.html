@@ -26,20 +26,6 @@
     var markers = [];
     var heatmap;
     var map;
-    var datacik = {};
-    var uniqid = 0;
-
-    var count = function (arraycik, data) {
-      var temp = [];
-      let loc = data.location;
-      for (var i = 0; i < arraycik.length; ++i) {
-        if (arraycik[i].location == loc)
-          temp.push(arraycik[i]);
-      }
-      return (temp.length ? temp : [data]);
-    }
-
-
     var getBinData = function () {
       
       var myLatlng = new google.maps.LatLng(39.9334, 32.8597);
@@ -53,19 +39,13 @@
       var url = location.protocol + "//" + location.host + "/heatmap/" + "{{username}}" + "/0"
       var binData = []
       var infowindow = new google.maps.InfoWindow();
-      var loc = [];
       $.getJSON(url, function (data) {
         $.each(data, function (index, value) {
           if (!isNaN(parseInt(value.latitude))) {
             binData.push(new google.maps.LatLng(value.latitude, value.longitude)); // adds lat and long data if the value is an integer
-            loc.push(value)
-          };
-          // if ((temp = count(binData, value)) == 0) {
-          var trs = count(loc, value);
-          // datacik[value.location] != undefined ? datacik[value.location].push(trs) : datacik[value.location] = trs ;
-          datacik[value.location] = trs;
-          // }
 
+          };
+          
           marker = new google.maps.Marker({
             position: new google.maps.LatLng(value.latitude, value.longitude),
             map: map,
@@ -77,7 +57,7 @@
           google.maps.event.addListener(marker, 'click', (function (marker, index) {
             return function () {
               var content = '<html>';
-              datacik[value.location].forEach(function (tmpData) {
+                data.filter(x => x.location == value.location).forEach(function (tmpData) {
                 content +=
                   `
                   <br>
@@ -101,7 +81,6 @@
         });
         heatmap.setMap(map);
       })
-
 
     }
 
