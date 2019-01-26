@@ -7,20 +7,9 @@ import json
 from InstagramAPI import InstagramAPI
 from flask import jsonify
 from typing import List, Dict, Tuple
-
+import cons
 
 class libInsta:
-    JSON = 0
-    RENDER = 1
-    RAW = 2
-
-    FOL = 0
-    IMAGE = 1
-    MAP = 2
-
-    NAN = 0
-    ALL = 1
-    API = None
 
     delayTime = 0
 
@@ -46,20 +35,20 @@ class libInsta:
         data = self.API.LastJson['user']
         toc = clock()
         rendTime = tic - toc
-        return self.imgfy([data], rendTime, rend, typ=self.IMAGE)
+        return self.imgfy([data], rendTime, rend, typ=cons.Template.IMAGE)
 
     def imgfy(self, data, rendTime: float, rend: int, typ=0):
-        if rend is self.RENDER:
-            if typ is self.FOL:
+        if rend is cons.Render.RENDER:
+            if typ is cons.Template.FOL:
                 return render_template('followship.html', users=data, rendTime=rendTime)
 
-            elif typ is self.IMAGE:
+            elif typ is cons.Template.IMAGE:
                 return render_template('imageship.html', images=data, rendTime=rendTime)
 
-            elif typ is self.MAP:
+            elif typ is cons.Template.MAP:
                 return render_template('heatmap.html', username=data[0])
 
-        if typ is self.MAP:
+        if typ is cons.Template.MAP:
             data = data.pop()
         return (data if rend else jsonify(data))
 
@@ -120,8 +109,8 @@ class libInsta:
     def match(self, victim: str, rend: int):
         tic = clock()
 
-        followers = self.getUserFollowers(victim, self.RAW, self.ALL)
-        followings = self.getUserFollowings(victim, self.RAW, self.ALL)
+        followers = self.getUserFollowers(victim, cons.Render.RAW, cons.Ret.ALL)
+        followings = self.getUserFollowings(victim, cons.Render.RAW, cons.Ret.ALL)
 
         pks = set([i['pk'] for i in followers]) & set(
             [i['pk'] for i in followings])
@@ -156,7 +145,7 @@ class libInsta:
 
     def getLocationPeople(self, victim: int, rend: int, getAll=0):
         tic = clock()
-        images = self.getLocationFeed(victim, self.RAW, getAll)
+        images = self.getLocationFeed(victim, cons.Render.RAW, getAll)
         users = self.getUsersFromImages(images)
         tmp = list()
         _ = [tmp.append(i) for i in users if i not in tmp]
@@ -191,11 +180,11 @@ class libInsta:
             items = self.API.LastJson['items']
 
         rendTime = clock() - tic
-        return self.imgfy(items, rendTime, rend, self.IMAGE)
+        return self.imgfy(items, rendTime, rend, cons.Template.IMAGE)
 
     def getUserLocations(self, victim: str, rend: int, last=0):
         locations = list()
-        items = self.getUserImages(victim, self.RAW, self.ALL, last)
+        items = self.getUserImages(victim, cons.Render.RAW, cons.Ret.ALL, last)
         for item in items:
             if item.get('location', None) is None:
                 pass
@@ -211,4 +200,4 @@ class libInsta:
                 data['latitude'] = item['location']['lat']
                 data['longitude'] = item['location']['lng']
                 locations.append(data)
-        return self.imgfy([victim, locations], 0, rend, self.MAP)
+        return self.imgfy([victim, locations], 0, rend, cons.Template.MAP)
