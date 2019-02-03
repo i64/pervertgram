@@ -9,6 +9,7 @@ from flask import jsonify
 from typing import List, Dict, Tuple
 import cons
 
+
 class libInsta:
 
     delayTime = 0
@@ -39,15 +40,11 @@ class libInsta:
 
     def imgfy(self, data, rendTime: float, rend: int, typ=0):
         if rend is cons.Render.RENDER:
-            if typ is cons.Template.FOL:
-                return render_template('followship.html', users=data, rendTime=rendTime)
-
-            elif typ is cons.Template.IMAGE:
-                return render_template('imageship.html', images=data, rendTime=rendTime)
-
-            elif typ is cons.Template.MAP:
-                return render_template('heatmap.html', username=data[0])
-
+            return{
+                cons.Template.FOL: render_template('followship.html', users=data, rendTime=rendTime),
+                cons.Template.IMAGE: render_template('imageship.html', images=data, rendTime=rendTime),
+                cons.Template.MAP:  render_template('heatmap.html', username=data[0]),
+            }[typ]
         if typ is cons.Template.MAP:
             data = data.pop()
         return (data if rend else jsonify(data))
@@ -109,8 +106,10 @@ class libInsta:
     def match(self, victim: str, rend: int):
         tic = clock()
 
-        followers = self.getUserFollowers(victim, cons.Render.RAW, cons.Ret.ALL)
-        followings = self.getUserFollowings(victim, cons.Render.RAW, cons.Ret.ALL)
+        followers = self.getUserFollowers(
+            victim, cons.Render.RAW, cons.Ret.ALL)
+        followings = self.getUserFollowings(
+            victim, cons.Render.RAW, cons.Ret.ALL)
 
         pks = set([i['pk'] for i in followers]) & set(
             [i['pk'] for i in followings])
@@ -196,7 +195,8 @@ class libInsta:
                 else:
                     data['source'] = item['carousel_media'][0]['image_versions2']['candidates'][0]['url']
                 data['link'] = item['code']
-                data['location'] =(item['location']['short_name'] if item['location'].get('short_name',None) else item['location']['name'])
+                data['location'] = (item['location']['short_name'] if item['location'].get(
+                    'short_name', None) else item['location']['name'])
                 data['latitude'] = item['location']['lat']
                 data['longitude'] = item['location']['lng']
                 locations.append(data)
