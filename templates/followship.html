@@ -2,6 +2,7 @@
 <html>
 
 <head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <style>
     @import url(https://fonts.googleapis.com/css?family=Roboto:400,300);
 
@@ -42,7 +43,6 @@
     }
   </style>
 </head>
-<h1>API Latency: {{rendTime}}</h1>
 <div class="context-menu">
   <div class="item" id="goto-profile">Goto profile</div>
   <div class="item" id="get-followers">Get followers</div>
@@ -50,63 +50,68 @@
   <div class="item" id="get-matches">Get matches</div>
   <div class="item" id="get-hd-pp">Full-size profile picture </div>
 </div>
-<main class="grid">
-
-  {% for user in users %}
-  <img class="interact" src="{{user['profile_pic_url']}}" username="{{user['username']}}">
-  {% endfor %}
+<main id="grid">
 </main>
 <footer>
   <script>
-    (function() {
-      var contextMenu = document.querySelector(".context-menu");
-      var cmGotoProfile = document.getElementById("goto-profile");
-      var cmFollowers = document.getElementById("get-followers");
-      var cmFollowings = document.getElementById("get-followings");
-      var cmMatches = document.getElementById("get-matches");
-      var cmDP = document.getElementById("get-hd-pp");
-
-      var interacts = document.getElementsByClassName("interact");
-      var username;
-
-      for (var i = 0; i < interacts.length; i++) {
-        interacts[i].addEventListener("contextmenu", function(e) {
-          e.preventDefault();
-          contextMenu.style.top = window.scrollY + e.clientY + "px";
-          contextMenu.style.left = e.clientX + "px";
-          contextMenu.style.display = "block";
-          username = this.getAttribute("username");
-        });
-      }
-
-
-      document.addEventListener("click", function(e) {
+    (function () {
+      window.ontextMenu = document.querySelector(".context-menu");
+      window.cmGotoProfile = document.getElementById("goto-profile");
+      window.cmFollowers = document.getElementById("get-followers");
+      window.cmFollowings = document.getElementById("get-followings");
+      window.cmMatches = document.getElementById("get-matches");
+      window.cmDP = document.getElementById("get-hd-pp");
+      window.next = new String();
+      document.addEventListener("click", function (e) {
         var button = e.which || e.button;
         if (button === 1) {
-          contextMenu.style.display = "none";
+          window.contextMenu.style.display = "none";
         }
       });
+    })();
 
+    function addInteract(username) {
 
-      cmGotoProfile.onclick = function() {
+      window.cmGotoProfile.onclick = function () {
         window.open('http://instagram.com/' + username, '_blank');
       };
 
-      cmFollowers.onclick = function() {
+      window.cmFollowers.onclick = function () {
         window.open(document.location.origin + '/followers/' + username, '_blank');
       };
-      cmFollowings.onclick = function() {
+      window.cmFollowings.onclick = function () {
         window.open(document.location.origin + '/followings/' + username, '_blank');
       };
-        cmMatches.onclick = function() {
+      window.cmMatches.onclick = function () {
         window.open(document.location.origin + '/match/' + username, '_blank');
       };
-      cmDP.onclick = function() {
+      window.cmDP.onclick = function () {
         window.open(document.location.origin + '/dp/' + username, '_blank');
       };
-    })();
+    };
+
+    function getUsers(next) {
+      let x = window.location.href.split('/');
+      var url =
+        `${document.location.origin}/api/${x[x.length-2]}/${x[x.length-1]}/${next}`;
+      $.getJSON(url, function (data) {
+        window.next = data.next;
+        $.each(data.users, function (index, value) {
+          dat = `<img class="interact" src="${value.profile_pic_url}" username="${value.username}">`;
+          $('body > main').append(dat);
+          document.getElementById('grid').lastChild.addEventListener("contextmenu", function (e) {
+            e.preventDefault();
+            contextMenu.style.top = window.scrollY + e.clientY + "px";
+            contextMenu.style.left = e.clientX + "px";
+            contextMenu.style.display = "block";
+
+          });
+          addInteract(value.username);
+        })
+      })
+    };
+    getUsers(window.next);
   </script>
 </footer>
 
 </html>
-
