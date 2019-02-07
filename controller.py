@@ -44,7 +44,6 @@ class libInsta:
         return users
 
     def getUserFollowings(self, victim: str, next_max_id=None):
-
         result = dict()
         user_id = self.getsUserid(victim)
         _ = self.API.getUserFollowings(user_id, maxid=next_max_id)
@@ -83,7 +82,6 @@ class libInsta:
         return users
 
     def getLocationFeed(self, victim: int, next_max_id=''):
-
         result = dict()
         _ = self.API.getLocationFeed(victim, maxid=next_max_id)
         self.delay()
@@ -93,7 +91,6 @@ class libInsta:
         return result
 
     def getLocationPeople(self, victim: int):
-
         images = self.getLocationFeed(victim)
         users = self.getUsersFromImages(images)
         tmp = list()
@@ -102,7 +99,6 @@ class libInsta:
         return tmp
 
     def getUserImages(self, victim: str, next=''):
-
         result = dict()
         _ = self.API.getUserFeed(self.getsUserid(victim), maxid=next)
         result['items'] = self.API.LastJson.get('items', [])
