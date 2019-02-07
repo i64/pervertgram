@@ -28,9 +28,8 @@ class libInsta:
 
         id = self.getsUserid(victim)
         _ = self.API.getUsernameInfo(id)
-        data = self.API.LastJson['user']
 
-        return data
+        return self.API.LastJson['user']
 
     def getUsersFromID(self, pks, follow=None):
         users = list()
@@ -60,7 +59,6 @@ class libInsta:
         result = dict()
         user_id = self.getsUserid(victim)
         _ = self.API.getUserFollowers(user_id, maxid=next_max_id)
-        print(_)
         self.delay()
         result['users'] = self.API.LastJson.get('users', [])
         result['next'] = self.API.LastJson.get('next_max_id', '')
