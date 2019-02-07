@@ -25,7 +25,6 @@ class libInsta:
         return [image['user'] for image in images]
 
     def getUserInfo(self, victim: str):
-
         id = self.getsUserid(victim)
         _ = self.API.getUsernameInfo(id)
 
