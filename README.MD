@@ -7,17 +7,15 @@ A weekend project from a cyber-pervert.
 
 ```
 http://localhost:5002/followings/<victim> or
-http://localhost:5002/followings/<victim>/<int:rend> or
-http://localhost:5002/followings/<victim>/<int:rend>/<int:getAll>
+http://localhost:5002/followings/api/<victim>/
 ```
 ```
 http://localhost:5002/followers/<victim> or
-http://localhost:5002/followers/<victim>/<int:rend> or
-http://localhost:5002/followers/<victim>/<int:rend>/<int:getAll> 
+http://localhost:5002/api/followers/<victim>/
 ```
 ```
 http://localhost:5002/match/<victim> or
-http://localhost:5002/match/<victim>/<int:rend>
+http://localhost:5002/api/match/<victim>/
 ```
 
 ## Get HD Profile Picture
@@ -25,45 +23,45 @@ http://localhost:5002/match/<victim>/<int:rend>
 ![](images/1.png)
 ```
 http://localhost:5002/dp/<victim>
+http://localhost:5002/api/dp/<victim>
 ```
 ## Draw heatmap from users location 
 
 ![](images/2.gif)
 
 ```
-http://localhost:5002/dp/heatmap/<victim> or
-http://localhost:5002/dp/heatmap/<victim>/<int:rend>
+http://localhost:5002/dp/heatmap/<victim>
 ```
 ## Others
 
 ### Get photos from the given location
 
 ```
-http://localhost:5002/dp/location/<int:location> or
-http://localhost:5002/dp/location/<int:location>/<int:rend> or
-http://localhost:5002/dp/location/<int:location>/<int:rend>/<int:getAll>
+http://localhost:5002/dp/location/<int:location>
 ```
 
-### Get people from the given location
 
+## Routes
+### API
 ```
-http://localhost:5002/dp/location-people/<int:location> or
-http://localhost:5002/dp/location-people/<int:location>/<int:rend> or
-http://localhost:5002/dp/location-people/<int:location>/<int:rend>/<int:getAll>
-```
-
-### Params
-```
-rend = 0 => returns json data
-rend = 1 => returns rendered html file
-rend = 2 => returns raw dictionary data(for internal work)
+'/api/followings/<victim>/'
+'/api/followers/<victim>/'
+'/api/match/<victim>/'
+'/api/location/<victim>/'
+'/api/dp/<victim>/'
+'/api/user-locations/<victim>/'
 ```
 
+### View
 ```
-getAll = 0 => returns first page of data
-getAll = 1 => returns all the data
+'/followings/<victim>'
+'/followers/<victim>'
+'/match/<victim>'
+'/location-people/<int:location>'
+'/heatmap/<victim>'
+'/location/<int:location>'
+'/dp/<victim>'
 ```
-
 ### config.json
 
 ```json
