@@ -53,7 +53,6 @@ class libInsta:
         return result
 
     def getUserFollowers(self, victim: str, next_max_id=''):
-
         result = dict()
         user_id = self.getsUserid(victim)
         _ = self.API.getUserFollowers(user_id, maxid=next_max_id)
@@ -64,7 +63,6 @@ class libInsta:
         return result
 
     def getMatches(self, victim: str):
-
         followers = self.getUserFollowers(
             victim)
         followings = self.getUserFollowings(
