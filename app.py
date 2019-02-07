@@ -20,33 +20,38 @@ instalib = libInsta(levAPI)
 
 
 class getUserFollowings(Resource):
-    def get(self, victim, next=None):
-        return instalib.getUserFollowings(victim, next_max_id=next)
+    def get(self, victim, next=''):
+        return jsonify(instalib.getUserFollowings(victim, next_max_id=next))
 
 
 class getUserFollowers(Resource):
-    def get(self, victim, next=None):
-        return instalib.getUserFollowers(victim, next_max_id=next)
+    def get(self, victim, next=''):
+        return jsonify(instalib.getUserFollowers(victim, next_max_id=next))
 
 
 class getMatches(Resource):
     def get(self, victim):
-        return instalib.getMatches(victim)
+        return jsonify(instalib.getMatches(victim))
 
 
 class getLocationPeople(Resource):
-    def get(self, victim):
-        return instalib.getLocationPeople(victim)
+    def get(self, victim, next=''):
+        return jsonify(instalib.getLocationPeople(victim))
 
 
 class getLocationFeed(Resource):
-    def get(self, victim):
-        return instalib.getLocationFeed(victim)
+    def get(self, victim, next=''):
+        return jsonify(instalib.getLocationFeed(victim, next_max_id=next))
 
 
 class getHdimage(Resource):
     def get(self, victim):
-        return instalib.getHdimage(victim)
+        return jsonify(instalib.getUserInfo(victim))
+
+
+class getUserLocations(Resource):
+    def get(self, victim):
+        return jsonify(instalib.getUserLocations(victim))
 
 
 api.add_resource(getUserFollowings, '/api/followings/<victim>/',
@@ -54,11 +59,15 @@ api.add_resource(getUserFollowings, '/api/followings/<victim>/',
 api.add_resource(getUserFollowers,  '/api/followers/<victim>/',
                  '/api/followers/<victim>/<next>')
 
-api.add_resource(getMatches,        '/api/match/<victim>')
-api.add_resource(getLocationPeople, '/api/location-people/<victim>')
-api.add_resource(getLocationFeed,   '/api/location/<victim>')
+api.add_resource(getMatches,        '/api/match/<victim>/')
+# api.add_resource(getLocationPeople, '/api/location-people/<victim>/',
+#                  '/api/location-people/<victim>/<next>')
+api.add_resource(getLocationFeed,   '/api/location/<victim>/',
+                 '/api/location/<victim>/<next>')
+
 api.add_resource(getHdimage,        '/api/dp/<victim>')
 
+api.add_resource(getUserLocations,        '/api/user-locations/<victim>')
 
 @app.route('/followings/<victim>')
 def viewFollowings(victim):
@@ -75,19 +84,24 @@ def viewMatches(victim):
     return render_template('followship.html')
 
 
-@app.route('/location-people/<int:location>')
-def viepHeatmap(data):
+# @app.route('/location-people/<int:location>')
+# def viewLocationPeople(location):
+#     return render_template('heatmap.html')
+
+
+@app.route('/heatmap/<victim>')
+def viewHeatmap(victim):
     return render_template('heatmap.html')
 
 
 @app.route('/location/<int:location>')
-def viewLocation(victim):
+def viewLocation(location):
     return render_template('imageship.html')
 
 
 @app.route('/dp/<victim>')
 def viewDP(victim):
-    return render_template('imageship.html')
+    return render_template('dp.html')
 
 
 if __name__ == '__main__':

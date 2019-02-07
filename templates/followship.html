@@ -60,13 +60,29 @@
     var cmFollowings = document.getElementById("get-followings");
     var cmMatches = document.getElementById("get-matches");
     var cmDP = document.getElementById("get-hd-pp");
+    var x = window.location.href.split('/');
     window.next = new String();
     var username;
+    var lock = false;
 
-    function getUsers(next) {
-      let x = window.location.href.split('/');
+    $.ajaxSetup({
+      async: false
+    });
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    String.prototype.isEmpty = String.prototype.isEmpty || function () {
+      return !(!!this.trim().length);
+    }
+
+    function isScrollable() {
+      return document.body.clientHeight > document.documentElement.clientHeight
+    }
+
+    function getUsers() {
       var url =
-        `${document.location.origin}/api/${x[x.length-2]}/${x[x.length-1]}/${next}`;
+        `${document.location.origin}/api/${x[x.length-2]}/${x[x.length-1]}/${window.next}`;
       $.getJSON(url, function (data) {
         window.next = data.next;
         $.each(data.users, function (index, value) {
@@ -103,9 +119,37 @@
         cmDP.onclick = function () {
           window.open(`${document.location.origin}/dp/${username}`, '_blank');
         };
+        lock = false;
       })
     };
-    getUsers(window.next);
+
+    function updateUsers() {
+      if (!lock) {
+        lock = true;
+        getUsers();
+      }
+    }
+
+
+    function scrollLoader() {
+
+      var grid = document.getElementById('grid');
+      var contentHeight = grid.offsetHeight;
+      var yOffset = window.pageYOffset;
+      var y = yOffset + window.innerHeight;
+      if (y >= contentHeight && !window.next.isEmpty()) {
+        updateUsers();
+      }
+    }
+    window.onscroll = scrollLoader;
+
+    (async function () {
+      updateUsers();
+      while (!isScrollable() && !window.next.isEmpty()) {
+        updateUsers();
+        await sleep(50);
+      };
+    })();
   </script>
 </footer>
 

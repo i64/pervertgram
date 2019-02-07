@@ -2,53 +2,183 @@
 <html>
 
 <head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <style>
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      grid-gap: 8;
-      align-items: stretch;
+    @import url(https://fonts.googleapis.com/css?family=Roboto:400,300);
+
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    .grid img {
-      border: 1px solid #ccc;
-      box-shadow: 2px 2px 6px 0px rgba(0, 0, 0, 0.3);
-      max-width: 100%;
-      height: auto;
-
+    .context-menu {
+      display: none;
+      position: absolute;
+      width: 210px;
+      cursor: pointer;
+      background: white;
+      box-shadow: 0 0 5px grey;
     }
-    .normal img{
-      height: 100%;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
+
+    .context-menu .item {
+      width: 100%;
+      border-bottom: 1px solid lightgrey;
+      font-family: "Roboto", sans-serif;
+      font-size: 1.3em;
+      color: #0066aa;
+    }
+
+    .context-menu .item:last-child {
+      border: 0;
+    }
+
+    .interact {
+      display: inline-block;
+      width: 200px;
+      height: 200px;
+      background: pink;
     }
   </style>
+</head>
+<div class="context-menu">
+  <div class="item" id="goto-post">Goto post</div>
+  <div class="item" id="get-pic">Goto picture</div>
+  <div class="item" id="goto-profile">Goto profile</div>
+  <div class="item" id="get-followers">Get followers</div>
+  <div class="item" id="get-followings">Get followings</div>
+  <div class="item" id="get-matches">Get matches</div>
+</div>
+<main id="grid">
+</main>
+<footer>
+  <script>
+    var contextMenu = document.querySelector(".context-menu");
+    var cmGotoPost = document.getElementById("goto-post");
+    var cmPicture = document.getElementById("get-pic");
+    var cmGotoProfile = document.getElementById("goto-profile");
+    var cmFollowers = document.getElementById("get-followers");
+    var cmFollowings = document.getElementById("get-followings");
+    var cmMatches = document.getElementById("get-matches");
 
-  <head>
+    var x = window.location.href.split('/');
+    window.next = new String();
+    var username, src, code;
+    var lock = false;
 
-    {% if images[0].get('hd_profile_pic_url_info',None) %}
-      <main class="normal">
-    {%else%}
-    <h1>API Latency: {{rendTime}}</h1>
-      <main class="grid">
-    {%endif%}
-      {% for image in images %}
-        {% if image.get('hd_profile_pic_url_info',None) %}
-          <a href="{{image['hd_profile_pic_url_info']['url']}}">
-          <img src="{{image['hd_profile_pic_url_info']['url']}}">
-        {% else %}
-          <a href="http://instagram.com/{{image['user']['username']}}">
-          {% if image.get('carousel_media', None) %}
-            <img src="{{image['carousel_media'][0]['image_versions2']['candidates'][0]['url']}}">
-          {% elif image['image_versions2'].get('candidates',None) %}
-            <img src="{{image['image_versions2']['candidates'][0]['url']}}">
-          {% else %}
-            <img src="{{image['image_versions2'][0]['url']}}">
-          {% endif %}
-        {% endif %}
-      {% endfor %}
-    </main>
+    $.ajaxSetup({
+      async: false
+    });
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    String.prototype.isEmpty = String.prototype.isEmpty || function () {
+      return !(!!this.trim().length);
+    }
+
+    function isScrollable() {
+      return document.body.clientHeight > document.documentElement.clientHeight
+    }
+
+    function getSrc(value) {
+      if (value.carousel_media != undefined) {
+        return value.carousel_media[0].image_versions2.candidates[0].url;
+
+      } else if (value.image_versions2 != undefined) {
+
+        if (value.image_versions2.candidates != undefined) {
+          return value.image_versions2.candidates[0].url;
+        
+        } else {
+          return value.image_versions2[0].url;
+        }
+
+      }
+    }
+
+    function getImages() {
+      var url =
+        `${document.location.origin}/api/${window.x[window.x.length-2]}/${window.x[window.x.length-1]}/${window.next}`;
+      $.getJSON(url, function (data) {
+
+        window.next = data.next;
+        $.each(data.images, function (index, value) {
+          dat =
+            `<img class="interact" username=${value.user.username} src="${getSrc(value)}">`;
+
+          $('body > main').append(dat);
+
+          document.getElementById('grid').lastChild.addEventListener("contextmenu", function (e) {
+            e.preventDefault();
+
+            contextMenu.style.top = window.scrollY + e.clientY + "px";
+            contextMenu.style.left = e.clientX + "px";
+            contextMenu.style.display = "block";
+            username = value.user.username;
+            src = getSrc(value);
+            code = value.code;
+          });
+        })
+
+        document.addEventListener("click", function (e) {
+          var button = e.which || e.button;
+          if (button === 1) {
+            contextMenu.style.display = "none";
+          }
+        });
+        cmGotoProfile.onclick = function () {
+          window.open(`http://instagram.com/${username}`, '_blank');
+        };
+
+        cmFollowers.onclick = function () {
+          window.open(`${document.location.origin}/followers/${username}`, '_blank');
+        };
+        cmFollowings.onclick = function () {
+          window.open(`${document.location.origin}/followings/${username}`, '_blank');
+        };
+        cmMatches.onclick = function () {
+          window.open(`${document.location.origin}/match/${username}`, '_blank');
+        };
+        cmGotoPost.onclick = function () {
+          window.open(`https://www.instagram.com/p/${code}`, '_blank');
+        };
+        cmPicture.onclick = function () {
+          window.open(`${src}`, '_blank');
+        };
+        lock = false;
+      });
+    };
+
+    function updateImages() {
+      if (!lock) {
+        lock = true;
+        getImages();
+      }
+    }
+
+    function scrollLoader() {
+
+      var grid = document.getElementById('grid');
+      var contentHeight = grid.offsetHeight;
+      var yOffset = window.pageYOffset;
+      var y = yOffset + window.innerHeight;
+      if (y >= contentHeight && !window.next.isEmpty()) {
+        updateImages();
+      }
+    }
+    window.onscroll = scrollLoader;
+
+    (async function () {
+      updateImages();
+      while (!isScrollable() && !window.next.isEmpty()) {
+        updateImages();
+        await sleep(50);
+      };
+    })();
+  </script>
+</footer>
 
 </html>
-

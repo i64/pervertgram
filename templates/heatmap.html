@@ -4,21 +4,21 @@
   <style>
 
     html, body, #map-canvas {
-        height: 100%;
-        margin: 0px;
-        padding: 0px
-    }
-    #panel {
-        position: absolute;
-        top: 5px;
-        left: 50%;
-        margin-left: -180px;
-        z-index: 5;
-        background-color: #fff;
-        padding: 5px;
-        border: 1px solid #999;
-    }
-  </style>
+      height: 100%;
+      margin: 0px;
+      padding: 0px
+  }
+  #panel {
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      margin-left: -180px;
+      z-index: 5;
+      background-color: #fff;
+      padding: 5px;
+      border: 1px solid #999;
+  }
+</style>
 
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=visualization&sensor=true_or_false"></script>
@@ -26,8 +26,8 @@
     var markers = [];
     var heatmap;
     var map;
+    var urlPart = window.location.href.split('/');
     var getBinData = function () {
-      
       var myLatlng = new google.maps.LatLng(39.9334, 32.8597);
 
       map = new google.maps.Map(document.getElementById('map-canvas'), {
@@ -36,16 +36,16 @@
         mapTypeId: google.maps.MapTypeId.ROADMAP
       });
       var iconBase = '';
-      var url = location.protocol + "//" + location.host + "/heatmap/" + "{{username}}" + "/0"
-      var binData = []
+      var url = `${document.location.origin}/api/user-locations/${urlPart[urlPart.length-1]}`;
+      var binData = [];
       var infowindow = new google.maps.InfoWindow();
       $.getJSON(url, function (data) {
         $.each(data, function (index, value) {
           if (!isNaN(parseInt(value.latitude))) {
-            binData.push(new google.maps.LatLng(value.latitude, value.longitude)); // adds lat and long data if the value is an integer
+            binData.push(new google.maps.LatLng(value.latitude, value.longitude));
 
           };
-          
+
           marker = new google.maps.Marker({
             position: new google.maps.LatLng(value.latitude, value.longitude),
             map: map,
@@ -57,15 +57,15 @@
           google.maps.event.addListener(marker, 'click', (function (marker, index) {
             return function () {
               var content = '<html>';
-                data.filter(x => x.location == value.location).forEach(function (tmpData) {
+              data.filter(x => x.location == value.location).forEach(function (tmpData) {
                 content +=
                   `
-                  <br>
-                  <a>${tmpData.location}</a>
-                  <br>
-                  <a target="_blank" rel="noopener noreferrer" href="http://instagram.com/p/${value.link}" >
-                  <img src="${tmpData.source}" width = "150">
-                  `
+                <br>
+                <a>${tmpData.location}</a>
+                <br>
+                <a target="_blank" rel="noopener noreferrer" href="http://instagram.com/p/${value.link}" >
+                <img src="${tmpData.source}" width = "150">
+                `
 
               });
               content += '</html>';

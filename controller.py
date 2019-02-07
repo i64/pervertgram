@@ -1,5 +1,5 @@
 from time import clock, sleep
-from flask import jsonify
+from flask import jsonify, json
 from InstagramAPI import InstagramAPI
 
 import cons
@@ -24,13 +24,13 @@ class libInsta:
     def getUsersFromImages(self, images):
         return [image['user'] for image in images]
 
-    def getHdimage(self, victim: str):
+    def getUserInfo(self, victim: str):
 
         id = self.getsUserid(victim)
         _ = self.API.getUsernameInfo(id)
         data = self.API.LastJson['user']
 
-        return jsonify([data])
+        return data
 
     def getUsersFromID(self, pks, follow=None):
         users = list()
@@ -44,7 +44,7 @@ class libInsta:
                 users.append(self.API.LastJson)
         return users
 
-    def getUserFollowings(self, victim: str,next_max_id=None):
+    def getUserFollowings(self, victim: str, next_max_id=None):
 
         result = dict()
         user_id = self.getsUserid(victim)
@@ -52,25 +52,20 @@ class libInsta:
         self.delay()
         result['users'] = self.API.LastJson.get('users', [])
         result['next'] = self.API.LastJson.get('next_max_id', '')
-        
-        return jsonify(result)
 
-    def getUserFollowers(self, victim: str,next_max_id=None):
+        return result
+
+    def getUserFollowers(self, victim: str, next_max_id=''):
 
         result = dict()
-
         user_id = self.getsUserid(victim)
-        next_max_id = True
-
-        if next_max_id is True:
-            next_max_id = ''
         _ = self.API.getUserFollowers(user_id, maxid=next_max_id)
+        print(_)
         self.delay()
-
         result['users'] = self.API.LastJson.get('users', [])
         result['next'] = self.API.LastJson.get('next_max_id', '')
-        
-        return jsonify(result)
+
+        return result
 
     def getMatches(self, victim: str):
 
@@ -87,21 +82,17 @@ class libInsta:
             base = followings
         users = self.getUsersFromID(pks, base)
 
-        return jsonify(users)
+        return users
 
-    def getLocationFeed(self, victim: int):
+    def getLocationFeed(self, victim: int, next_max_id=''):
 
-        images = list()
-        next_max_id = True
-
-        if next_max_id is True:
-            next_max_id = ''
+        result = dict()
         _ = self.API.getLocationFeed(victim, maxid=next_max_id)
         self.delay()
-        images.extend(self.API.LastJson.get('items', []))
-        next_max_id = self.API.LastJson.get('next_max_id', '')
+        result['items'] = self.API.LastJson.get('items', [])
+        result['next'] = self.API.LastJson.get('next_max_id', '')
 
-        return jsonify(next_max_id, images)
+        return result
 
     def getLocationPeople(self, victim: int):
 
@@ -110,31 +101,29 @@ class libInsta:
         tmp = list()
         _ = [tmp.append(i) for i in users if i not in tmp]
 
-        return jsonify(tmp)
+        return tmp
 
-    def getUserImages(self, victim: str, last=0):
+    def getUserImages(self, victim: str, next=''):
 
-        items = list()
-        id = self.getsUserid(victim)
+        result = dict()
+        _ = self.API.getUserFeed(self.getsUserid(victim), maxid=next)
+        result['items'] = self.API.LastJson.get('items', [])
+        result['next'] = self.API.LastJson.get('next_max_id', '')
 
-        next_max_id = True
-        counter = 0
-        if last is not 0:
-            counter += 1
-            if counter >= last:
-                return
-
-        if next_max_id is True:
-            next_max_id = ''
-        _ = self.API.getUserFeed(id, maxid=next_max_id)
-        items.extend(self.API.LastJson.get('items', []))
-        next_max_id = self.API.LastJson.get('next_max_id', '')
-
-        return jsonify(next_max_id, items)
+        return result
 
     def getUserLocations(self, victim: str):
         locations = list()
-        items = self.getUserImages(victim)
+        items = list()
+
+        next = True
+        while(next):
+            _ = self.getUserImages(
+                victim, ('' if next == True else next))
+            next = _['next']
+
+            items.extend(_['items'])
+
         for item in items:
             if item.get('location', None) is None:
                 pass
@@ -150,5 +139,4 @@ class libInsta:
                 data['latitude'] = item['location']['lat']
                 data['longitude'] = item['location']['lng']
                 locations.append(data)
-                
-        return jsonify([victim, locations])
+        return locations
