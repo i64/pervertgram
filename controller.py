@@ -88,12 +88,18 @@ class libInsta:
         return result
 
     def getLocationPeople(self, victim: int):
-        images = self.getLocationFeed(victim)
-        users = self.getUsersFromImages(images)
-        tmp = list()
-        _ = [tmp.append(i) for i in users if i not in tmp]
-
-        return tmp
+        images = list()
+        next = True
+        while(next):
+            _ = self.getLocationFeed(
+                victim, ('' if next == True else next))
+            next = _['next']
+            images.extend(_['items'])
+        users = list()
+        _ = [users.append(user) for user in self.getUsersFromImages(
+            images) if user not in users]
+            
+        return users
 
     def getUserImages(self, victim: str, next=''):
         result = dict()

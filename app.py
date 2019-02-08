@@ -60,8 +60,8 @@ api.add_resource(getUserFollowers,  '/api/followers/<victim>/',
                  '/api/followers/<victim>/<next>')
 
 api.add_resource(getMatches,        '/api/match/<victim>/')
-# api.add_resource(getLocationPeople, '/api/location-people/<victim>/',
-#                  '/api/location-people/<victim>/<next>')
+api.add_resource(getLocationPeople, '/api/location-people/<victim>/',
+                 '/api/location-people/<victim>/<next>')
 api.add_resource(getLocationFeed,   '/api/location/<victim>/',
                  '/api/location/<victim>/<next>')
 
@@ -84,9 +84,9 @@ def viewMatches(victim):
     return render_template('followship.html')
 
 
-# @app.route('/location-people/<int:location>')
-# def viewLocationPeople(location):
-#     return render_template('heatmap.html')
+@app.route('/location-people/<int:location>')
+def viewLocationPeople(location):
+    return render_template('people.html')
 
 
 @app.route('/heatmap/<victim>')
