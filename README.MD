@@ -25,6 +25,7 @@ http://localhost:5002/api/match/<victim>/
 http://localhost:5002/dp/<victim>
 http://localhost:5002/api/dp/<victim>
 ```
+
 ## Draw heatmap from users location 
 
 ![](images/2.gif)
@@ -32,6 +33,7 @@ http://localhost:5002/api/dp/<victim>
 ```
 http://localhost:5002/dp/heatmap/<victim>
 ```
+
 ## Others
 
 ### Get photos from the given location
@@ -41,9 +43,15 @@ http://localhost:5002/location/<int:location>
 http://localhost:5002/api/location/<int:location>
 ```
 
-
+### Get people from the given location
+```
+http://localhost:5002/location-people/<int:location>
+http://localhost:5002/api/location-people/<int:location>
+```
 ## Routes
+
 ### API
+
 ```
 '/api/followings/<victim>/'
 '/api/followers/<victim>/'
@@ -51,9 +59,11 @@ http://localhost:5002/api/location/<int:location>
 '/api/location/<victim>/'
 '/api/dp/<victim>/'
 '/api/user-locations/<victim>/'
+'/api/location-people/<int:location>'
 ```
 
 ### View
+
 ```
 '/followings/<victim>'
 '/followers/<victim>'
@@ -62,6 +72,7 @@ http://localhost:5002/api/location/<int:location>
 '/heatmap/<victim>'
 '/location/<int:location>'
 '/dp/<victim>'
+'/location-people/<int:location>'
 ```
 ### config.json
 
