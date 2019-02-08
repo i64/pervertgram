@@ -70,7 +70,7 @@
 
     function getUsers() {
       var url =
-        `${document.location.origin}/api/location-people/${x[x.length-1]}/${window.next}`;
+        `${document.location.origin}/api/${x[x.length-2]}/${x[x.length-1]}`;
       $.getJSON(url, function (data) {
         $.each(data, function (index, value) {
           dat = `<img class="interact" src="${value.profile_pic_url}" username="${value.username}">`;

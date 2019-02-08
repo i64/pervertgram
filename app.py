@@ -81,7 +81,7 @@ def viewFollowers(victim):
 
 @app.route('/match/<victim>')
 def viewMatches(victim):
-    return render_template('followship.html')
+    return render_template('people.html')
 
 
 @app.route('/location-people/<int:location>')

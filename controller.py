@@ -37,9 +37,9 @@ class libInsta:
                 if user['pk'] in pks:
                     users.append(user)
         else:
-            for user in pks:
-                _ = self.API.getUsernameInfo(user)
-                users.append(self.API.LastJson)
+            for pk in pks:
+                _ = self.API.getUsernameInfo(pk)
+                users.append(self.API.LastJson['user'])
         return users
 
     def getUserFollowings(self, victim: str, next_max_id=None):
@@ -63,13 +63,24 @@ class libInsta:
         return result
 
     def getMatches(self, victim: str):
-        followers = self.getUserFollowers(
-            victim)
-        followings = self.getUserFollowings(
-            victim)
+        followers = list()
+        followings = list()
 
-        pks = set([i['pk'] for i in followers]) & set(
-            [i['pk'] for i in followings])
+        next = True
+        while(next):
+            _ = self.getUserFollowers(
+                victim, ('' if next == True else next))
+            next = _['next']
+            followers.extend(_['users'])
+        next = True
+        while(next):
+            _ = self.getUserFollowings(
+                victim, ('' if next == True else next))
+            next = _['next']
+            followings.extend(_['users'])   
+
+        pks = set([follower['pk'] for follower in followers]) & set(
+            [following['pk'] for following in followings])
 
         base = followers
         if len(followers) > len(followings):
@@ -98,7 +109,7 @@ class libInsta:
         users = list()
         _ = [users.append(user) for user in self.getUsersFromImages(
             images) if user not in users]
-            
+
         return users
 
     def getUserImages(self, victim: str, next=''):
