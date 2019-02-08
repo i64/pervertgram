@@ -37,7 +37,8 @@ http://localhost:5002/dp/heatmap/<victim>
 ### Get photos from the given location
 
 ```
-http://localhost:5002/dp/location/<int:location>
+http://localhost:5002/location/<int:location>
+http://localhost:5002/api/location/<int:location>
 ```
 
 
