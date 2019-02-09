@@ -62,7 +62,6 @@
     var cmDP = document.getElementById("get-hd-pp");
     var x = window.location.href.split('/');
     var username;
-    var lock = false;
 
     $.ajaxSetup({
       async: false
@@ -106,7 +105,6 @@
         cmDP.onclick = function () {
           window.open(`${document.location.origin}/dp/${username}`, '_blank');
         };
-        lock = false;
       })
     };
 
