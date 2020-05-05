@@ -1,7 +1,4 @@
-try:
-    from time import clock, sleep
-except ImportError:
-    from time import perf_counter as clock
+from time import clock, sleep
 from flask import jsonify, json
 from InstagramAPI import InstagramAPI
 
