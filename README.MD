@@ -58,7 +58,6 @@ http://localhost:5002/api/location-people/<int:location>
 '/api/match/<victim>/'
 '/api/location/<victim>/'
 '/api/dp/<victim>/'
-'/api/user-locations/<victim>/'
 '/api/location-people/<int:location>'
 ```
 
@@ -72,7 +71,6 @@ http://localhost:5002/api/location-people/<int:location>
 '/heatmap/<victim>'
 '/location/<int:location>'
 '/dp/<victim>'
-'/location-people/<int:location>'
 ```
 ### config.json
 

@@ -2,13 +2,15 @@
 
 <head>
   <style>
-
-    html, body, #map-canvas {
+    html,
+    body,
+    #map-canvas {
       height: 100%;
       margin: 0px;
       padding: 0px
-  }
-  #panel {
+    }
+
+    #panel {
       position: absolute;
       top: 5px;
       left: 50%;
@@ -17,72 +19,67 @@
       background-color: #fff;
       padding: 5px;
       border: 1px solid #999;
-  }
-</style>
-
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=visualization&sensor=true_or_false"></script>
+    }
+  </style>
+  <script type="text/javascript"
+    src="https://maps.googleapis.com/maps/api/js?libraries=visualization&sensor=true_or_false"></script>
   <script>
-    var markers = [];
-    var heatmap;
-    var map;
-    var urlPart = window.location.href.split('/');
-    var getBinData = function () {
-      var myLatlng = new google.maps.LatLng(39.9334, 32.8597);
+    const username = window.location.href.split('/')[4];
+    let markers, heatmap, map;
+
+    async function getBinData() {
+      const myLatlng = new google.maps.LatLng(39.9334, 32.8597); // ANKARA
+
+      let map_data = [];
+      let infowindow = new google.maps.InfoWindow();
 
       map = new google.maps.Map(document.getElementById('map-canvas'), {
         center: myLatlng,
         zoom: 3,
         mapTypeId: google.maps.MapTypeId.ROADMAP
       });
-      var iconBase = '';
-      var url = `${document.location.origin}/api/user-locations/${urlPart[urlPart.length-1]}`;
-      var binData = [];
-      var infowindow = new google.maps.InfoWindow();
-      $.getJSON(url, function (data) {
-        $.each(data, function (index, value) {
-          if (!isNaN(parseInt(value.latitude))) {
-            binData.push(new google.maps.LatLng(value.latitude, value.longitude));
 
-          };
+      marekrs = await fetch(`${document.location.origin}/api/profile_locations/${username}`)
+        .then(response => response.json())
+        .then(
+          _json =>
+            _json.map(
+              item => {
+                if (!isNaN(parseInt(item.latitude))) {
+                  map_data.push(new google.maps.LatLng(item.latitude, item.longitude));
+                }
+                marker = new google.maps.Marker({
+                  position: new google.maps.LatLng(item.latitude, item.longitude),
+                  map: map,
+                });
 
-          marker = new google.maps.Marker({
-            position: new google.maps.LatLng(value.latitude, value.longitude),
-            map: map,
-            icon: iconBase + ''
-          });
-
-          markers.push(marker);
-
-          google.maps.event.addListener(marker, 'click', (function (marker, index) {
-            return function () {
-              var content = '<html>';
-              data.filter(x => x.location == value.location).forEach(function (tmpData) {
-                content +=
-                  `
-                <br>
-                <a>${tmpData.location}</a>
-                <br>
-                <a target="_blank" rel="noopener noreferrer" href="http://instagram.com/p/${value.link}" >
-                <img src="${tmpData.source}" width = "150">
-                `
-
-              });
-              content += '</html>';
-              infowindow.setContent(content);
-              infowindow.open(map, marker);
-
-            };
-          })(marker, index));
-
-        })
+                google.maps.event.addListener(marker, 'click', (function (marker) {
+                  return function () {
+                    let content = '<html>';
+                    _json.filter(x => x.location == item.location).forEach(function (_data) {
+                      content +=
+                        `
+                        <br>
+                        <a>${_data.location}</a>
+                        <br>
+                        <a target="_blank" rel="noopener noreferrer" href="http://instagram.com/p/${item.link}" >
+                        <img src="${_data.source}" width = "150">
+                         `
+                    });
+                    content += '</html>';
+                    infowindow.setContent(content);
+                    infowindow.open(map, marker);
+                  };
+                })(marker));
+                return marker
+              }
+            )
+        )
         heatmap = new google.maps.visualization.HeatmapLayer({
-          data: binData
+          data: map_data
         });
         heatmap.setMap(map);
-      })
-
-    }
+      }
 
     function changeRadius() {
       heatmap.set('radius', heatmap.get('radius') ? null : 35);
@@ -93,27 +90,23 @@
     }
 
     function toggleMarkers() {
+      let arg = map;
       if (markers[0].getMap() != null) {
-        var arg = null;
-      } else {
-        var arg = map;
+        arg = null;
       }
-      for (var i = 0; i < markers.length; i++) {
-        markers[i].setMap(arg);
-      }
+      markers.forEach(marker => marker.setMap(arg))
     }
 
     function toggleHeatmap() {
-
-      if (heatmap.getMap() != null) {
-        heatmap.setMap(null);
-      } else {
+      if (heatmap.getMap() == null) {
         heatmap.setMap(map);
+      } else {
+        heatmap.setMap(null);
       }
     }
 
     function changeGradient() {
-      var gradient = [
+      const gradient = [
         'rgba(0, 255, 255, 0)',
         'rgba(0, 255, 255, 1)',
         'rgba(0, 191, 255, 1)',
@@ -132,7 +125,6 @@
 
       heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
     }
-
     google.maps.event.addDomListener(window, 'load', getBinData);
   </script>
 </head>

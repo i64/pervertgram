@@ -1,3 +1,0 @@
-Flask_RESTful==0.3.6
-Flask==1.0.2
-InstagramAPI==1.0.2

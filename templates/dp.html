@@ -1,35 +1,13 @@
-<!DOCTYPE html>
 <html>
-
-<head>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <style>
-        img {
-            height: 100%;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-    </style>
-
     <head>
-
-        <main class="normal">
-
-        </main>
-        <footer>
-            <script>
-                let x = window.location.href.split('/');
-                var url =
-                    `${document.location.origin}/api/${x[x.length-2]}/${x[x.length-1]}`;
-                $.getJSON(url, function (data) {
-                    window.next = data.next;
-                    let url = data.hd_profile_pic_url_info.url
-                    dat =
-                        `<a href="${url}"><img src="${url}">`;
-                    $('body > main').append(dat);
-                })
-            </script>
-        </footer>
-
+        <style>
+            img {
+                height: 100%;
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        </style>
+    <head>
+    <a href="{{image_url}}"><img src="{{image_url}}"">
 </html>
